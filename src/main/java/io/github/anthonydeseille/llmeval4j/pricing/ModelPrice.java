@@ -1,5 +1,7 @@
 package io.github.anthonydeseille.llmeval4j.pricing;
 
+import java.util.Locale;
+
 /**
  * Price of a model, in US dollars per million tokens.
  * <p>
@@ -29,5 +31,11 @@ public record ModelPrice(double inputPerMillion, double outputPerMillion) {
     /** Price through a batch API billed at half price, such as Anthropic's Message Batches API. */
     public ModelPrice batch() {
         return new ModelPrice(inputPerMillion / 2, outputPerMillion / 2);
+    }
+
+    /** For reports: {@code $4.00 / $20.00 per million tokens (input / output)}. */
+    public String describe() {
+        return String.format(Locale.ROOT, "$%.2f / $%.2f per million tokens (input / output)", inputPerMillion,
+                outputPerMillion);
     }
 }

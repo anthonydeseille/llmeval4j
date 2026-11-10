@@ -89,6 +89,11 @@ public final class PriceTable {
         return find(model).map(p -> p.cost(inputTokens, outputTokens)).orElse(Double.NaN);
     }
 
+    /** Cost in dollars of the given tokens; {@code NaN} if the model has no price in this table. */
+    public double cost(String model, TokenUsage usage) {
+        return cost(model, usage.inputTokens(), usage.outputTokens());
+    }
+
     /** Model ids and their prices, in insertion order. */
     public Map<String, ModelPrice> asMap() {
         return prices;
