@@ -1,0 +1,4 @@
+/mvnw text eol=lf
+*.cmd text eol=crlf
+# Keep CRLF in the prompt fixture: the test checks line ending normalization
+src/test/resources/prompts/*.md -text
