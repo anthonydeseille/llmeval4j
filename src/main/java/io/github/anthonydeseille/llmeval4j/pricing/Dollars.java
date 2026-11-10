@@ -14,7 +14,11 @@ public final class Dollars {
     private Dollars() {
     }
 
-    /** {@code $0.03}, or {@code n/a} for an unknown cost. */
+    /**
+     * {@return the cost such as {@code $0.03}, or {@code n/a} for an unknown cost}
+     *
+     * @param dollars a cost, {@code NaN} if unknown
+     */
     public static String format(double dollars) {
         return Double.isNaN(dollars) ? UNKNOWN : String.format(Locale.ROOT, "$%.2f", dollars);
     }
@@ -22,6 +26,9 @@ public final class Dollars {
     /**
      * Rounded to the cent, for a history file or a JSON summary; {@code null} for an unknown cost, so
      * that it is written as an empty value rather than {@code NaN} or {@code 0}.
+     *
+     * @param dollars a cost, {@code NaN} if unknown
+     * @return the cost rounded to the cent, or {@code null}
      */
     public static Double roundToCents(double dollars) {
         return Double.isNaN(dollars) ? null : Math.round(dollars * 100) / 100.0;

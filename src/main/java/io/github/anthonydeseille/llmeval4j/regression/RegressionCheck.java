@@ -35,11 +35,18 @@ public final class RegressionCheck {
         this.metrics = List.copyOf(metrics);
     }
 
+    /** {@return a builder, to declare the matching columns and the metrics} */
     public static Builder builder() {
         return new Builder();
     }
 
-    /** Compares {@code current} with the latest row of the history having its matching values. */
+    /**
+     * Compares {@code current} with the latest row of the history having its matching values.
+     *
+     * @param history previous runs
+     * @param current values of the current run, by column name
+     * @return the reference run and the change of each metric
+     */
     public Comparison compare(EvalHistory history, Map<String, ?> current) {
         return compare(history, current, Map.of());
     }
@@ -49,6 +56,11 @@ public final class RegressionCheck {
      * row: the matching values are replaced by {@code fallback} and searched again. For instance, a
      * new model with no history yet is compared with the current model:
      * {@code compare(history, run, Map.of("model", "claude-sonnet-5-5"))}.
+     *
+     * @param history  previous runs
+     * @param current  values of the current run, by column name
+     * @param fallback matching values to search with when none matches the current run
+     * @return the reference run and the change of each metric
      */
     public Comparison compare(EvalHistory history, Map<String, ?> current, Map<String, ?> fallback) {
         Map<String, Object> keys = new LinkedHashMap<>();
@@ -79,18 +91,31 @@ public final class RegressionCheck {
         private Builder() {
         }
 
-        /** Columns a previous run must share with the current one to be comparable. */
+        /**
+         * {@return this builder}
+         *
+         * @param columns columns a previous run must share with the current one to be comparable
+         */
         public Builder sameValuesOf(String... columns) {
             matchingColumns.addAll(List.of(columns));
             return this;
         }
 
-        /** A metric to compare; reports list them in the order they are added. */
+        /**
+         * {@return this builder}
+         *
+         * @param metric a metric to compare; reports list them in the order they are added
+         */
         public Builder metric(Metric metric) {
             metrics.add(Objects.requireNonNull(metric, "metric"));
             return this;
         }
 
+        /**
+         * {@return the check}
+         *
+         * @throws IllegalStateException if no metric was added
+         */
         public RegressionCheck build() {
             if (metrics.isEmpty()) {
                 throw new IllegalStateException("Add at least one metric");

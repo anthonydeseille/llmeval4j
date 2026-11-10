@@ -13,15 +13,30 @@ public interface BudgetListener {
     BudgetListener NONE = new BudgetListener() {
     };
 
-    /** Spending reached the warning threshold (80% of the limit by default). */
+    /**
+     * Spending reached the warning threshold (80% of the limit by default).
+     *
+     * @param spentToday dollars spent today
+     * @param dailyLimit daily limit, in dollars
+     */
     default void onWarning(double spentToday, double dailyLimit) {
     }
 
-    /** Spending reached the limit: calls are refused until tomorrow. */
+    /**
+     * Spending reached the limit: calls are refused until tomorrow.
+     *
+     * @param spentToday dollars spent today
+     * @param dailyLimit daily limit, in dollars
+     */
     default void onExceeded(double spentToday, double dailyLimit) {
     }
 
-    /** A call was refused because the limit is reached; called on every refusal. */
+    /**
+     * A call was refused because the limit is reached; called on every refusal.
+     *
+     * @param spentToday dollars spent today
+     * @param dailyLimit daily limit, in dollars
+     */
     default void onRefused(double spentToday, double dailyLimit) {
     }
 }

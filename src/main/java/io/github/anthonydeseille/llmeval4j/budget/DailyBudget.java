@@ -53,16 +53,31 @@ public final class DailyBudget {
         this.listener = Objects.requireNonNull(listener, "listener");
     }
 
-    /** A budget of {@code dollarsPerDay}, with the system clock in UTC and no listener. */
+    /**
+     * A budget of {@code dollarsPerDay}, with the system clock in UTC and no listener.
+     *
+     * @param dollarsPerDay daily limit, in dollars
+     * @return the budget
+     */
     public static DailyBudget of(double dollarsPerDay) {
         return builder(dollarsPerDay).build();
     }
 
-    /** A budget that tracks spending but never refuses a call: for tests and tools. */
+    /**
+     * A budget that tracks spending but never refuses a call: for tests and tools.
+     *
+     * @return a budget without limit
+     */
     public static DailyBudget unlimited() {
         return of(Double.POSITIVE_INFINITY);
     }
 
+    /**
+     * Starts a budget with options: warning threshold, clock, listener.
+     *
+     * @param dollarsPerDay daily limit, in dollars
+     * @return a builder
+     */
     public static Builder builder(double dollarsPerDay) {
         return new Builder(dollarsPerDay);
     }
@@ -88,6 +103,8 @@ public final class DailyBudget {
     /**
      * Records the cost of a call. An unknown cost ({@code NaN}, model without a price) or a zero cost
      * is ignored.
+     *
+     * @param dollars cost of the call, in dollars
      */
     public void add(double dollars) {
         if (Double.isNaN(dollars) || dollars <= 0) {
@@ -117,18 +134,19 @@ public final class DailyBudget {
         }
     }
 
-    /** Dollars spent today. */
+    /** {@return dollars spent today} */
     public synchronized double spentToday() {
         resetOnNewDay();
         return spent;
     }
 
-    /** Dollars left today, never negative; infinite for an {@link #unlimited()} budget. */
+    /** {@return dollars left today, never negative; infinite for an {@link #unlimited()} budget} */
     public synchronized double remainingToday() {
         resetOnNewDay();
         return Math.max(0, limit - spent);
     }
 
+    /** {@return daily limit, in dollars} */
     public double limit() {
         return limit;
     }
@@ -155,23 +173,42 @@ public final class DailyBudget {
             this.limit = limit;
         }
 
-        /** Fraction of the cap at which {@link BudgetListener#onWarning} is called; 0.8 by default. */
+        /**
+         * {@return this builder}
+         *
+         * @param fraction fraction of the cap at which {@link BudgetListener#onWarning} is called, in
+         * (0, 1]; 0.8 by default
+         */
         public Builder warningThreshold(double fraction) {
             this.warningThreshold = fraction;
             return this;
         }
 
-        /** Clock that decides when a day starts; {@link Clock#systemUTC()} by default. */
+        /**
+         * {@return this builder}
+         *
+         * @param clock clock that decides when a day starts; {@link Clock#systemUTC()} by default
+         */
         public Builder clock(Clock clock) {
             this.clock = clock;
             return this;
         }
 
+        /**
+         * {@return this builder}
+         *
+         * @param listener notified at the warning threshold, at the limit and on refusals
+         */
         public Builder listener(BudgetListener listener) {
             this.listener = listener;
             return this;
         }
 
+        /**
+         * {@return the budget}
+         *
+         * @throws IllegalArgumentException if the limit is negative or the threshold not in (0, 1]
+         */
         public DailyBudget build() {
             return new DailyBudget(limit, warningThreshold, clock, listener);
         }

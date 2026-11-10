@@ -38,6 +38,9 @@ public final class EvalHistory {
     /**
      * Parses a CSV text whose first line is the header. Values may be quoted ({@code "a, b"}, with
      * {@code ""} for a quote inside). A row shorter than the header gets empty values.
+     *
+     * @param csv CSV text, header included
+     * @return the history
      */
     public static EvalHistory parse(String csv) {
         List<List<String>> lines = new ArrayList<>();
@@ -61,7 +64,13 @@ public final class EvalHistory {
         return new EvalHistory(header, rows);
     }
 
-    /** Reads a history file; an absent file is an empty history. */
+    /**
+     * Reads a history file; an absent file is an empty history.
+     *
+     * @param file the CSV file
+     * @return the history
+     * @throws java.io.UncheckedIOException if the file cannot be read
+     */
     public static EvalHistory read(Path file) {
         if (!Files.exists(file)) {
             return new EvalHistory(List.of(), List.of());
@@ -77,6 +86,9 @@ public final class EvalHistory {
      * Appends a row to a history file, creating it with a header made of the row's keys if it does not
      * exist yet.
      *
+     * @param file the CSV file
+     * @param row  column names and values, in column order
+     * @throws java.io.UncheckedIOException if the file cannot be read or written
      * @throws IllegalArgumentException if the file exists with other columns: rewrite its header (and
      *                                  pad its rows) before adding a column
      */
@@ -104,28 +116,40 @@ public final class EvalHistory {
         }
     }
 
-    /** Header line for these columns. */
+    /**
+     * {@return the header line, without line break}
+     *
+     * @param columns column names
+     */
     public static String header(List<String> columns) {
         return columns.stream().map(Csv::escape).collect(Collectors.joining(","));
     }
 
-    /** CSV line of a row's values, in its key order; {@code null} gives an empty cell. */
+    /**
+     * {@return the CSV line of the values, without line break; {@code null} gives an empty cell}
+     *
+     * @param row column names and values, in column order
+     */
     public static String line(Map<String, ?> row) {
         return row.values().stream().map(v -> v == null ? "" : Csv.escape(v.toString()))
                 .collect(Collectors.joining(","));
     }
 
-    /** Column names, in file order. */
+    /** {@return column names, in file order} */
     public List<String> columns() {
         return columns;
     }
 
-    /** Rows, oldest first. */
+    /** {@return rows, oldest first, as maps from column name to value} */
     public List<Map<String, String>> rows() {
         return rows;
     }
 
-    /** The most recent row (the last one in the file) that matches. */
+    /**
+     * {@return the most recent row (the last one in the file) that matches, if any}
+     *
+     * @param filter condition on a row
+     */
     public Optional<Map<String, String>> latest(Predicate<Map<String, String>> filter) {
         for (int i = rows.size() - 1; i >= 0; i--) {
             if (filter.test(rows.get(i))) {
@@ -138,6 +162,9 @@ public final class EvalHistory {
     /**
      * The most recent row having the given values, such as the same model and the same number of
      * questions. Values are compared as text, so {@code 20} matches {@code "20"}.
+     *
+     * @param values column names and the values they must have
+     * @return the most recent matching row, if any
      */
     public Optional<Map<String, String>> latestWith(Map<String, ?> values) {
         return latest(row -> values.entrySet().stream()

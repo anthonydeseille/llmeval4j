@@ -38,17 +38,23 @@ public final class PriceTable {
         this.prices = Collections.unmodifiableMap(new LinkedHashMap<>(prices));
     }
 
-    /** Built-in prices of common models, as of {@link #DEFAULTS_AS_OF}. */
+    /** {@return built-in prices of common models, as of {@link #DEFAULTS_AS_OF}} */
     public static PriceTable defaults() {
         return DEFAULTS;
     }
 
-    /** A table without any price, to fill with your own. */
+    /** {@return a table without any price, to fill with your own} */
     public static PriceTable empty() {
         return EMPTY;
     }
 
-    /** A copy of this table where {@code model} has the given price, replacing any previous one. */
+    /**
+     * {@return a copy of this table where {@code model} has the given price, replacing any previous
+     * one}
+     *
+     * @param model model id, such as {@code claude-sonnet-5-5}
+     * @param price its price
+     */
     public PriceTable with(String model, ModelPrice price) {
         Map<String, ModelPrice> copy = new LinkedHashMap<>(prices);
         copy.put(model, price);
@@ -60,6 +66,8 @@ public final class PriceTable {
      * {@code claude-opus-5-5.input=4.0} and {@code claude-opus-5-5.output=20.0}, in dollars per
      * million tokens. Both values are required for each model.
      *
+     * @param properties prices by {@code <model>.input} and {@code <model>.output} keys
+     * @return a copy of this table with these prices
      * @throws IllegalArgumentException if a model has only one of the two values, or a value is not a
      *                                  number
      */
@@ -80,21 +88,37 @@ public final class PriceTable {
         return new PriceTable(copy);
     }
 
+    /**
+     * {@return the price of the model, empty if the table has none}
+     *
+     * @param model model id
+     */
     public Optional<ModelPrice> find(String model) {
         return Optional.ofNullable(prices.get(model));
     }
 
-    /** Cost in dollars of a call; {@code NaN} if the model has no price in this table. */
+    /**
+     * {@return cost in dollars of the call; {@code NaN} if the model has no price in this table}
+     *
+     * @param model        model id
+     * @param inputTokens  input tokens of the call
+     * @param outputTokens output tokens of the call, reasoning tokens included
+     */
     public double cost(String model, long inputTokens, long outputTokens) {
         return find(model).map(p -> p.cost(inputTokens, outputTokens)).orElse(Double.NaN);
     }
 
-    /** Cost in dollars of the given tokens; {@code NaN} if the model has no price in this table. */
+    /**
+     * {@return cost in dollars of these tokens; {@code NaN} if the model has no price in this table}
+     *
+     * @param model model id
+     * @param usage tokens used
+     */
     public double cost(String model, TokenUsage usage) {
         return cost(model, usage.inputTokens(), usage.outputTokens());
     }
 
-    /** Model ids and their prices, in insertion order. */
+    /** {@return model ids and their prices, in insertion order, unmodifiable} */
     public Map<String, ModelPrice> asMap() {
         return prices;
     }

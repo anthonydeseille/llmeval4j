@@ -27,8 +27,10 @@ public final class Prompts {
     }
 
     /**
-     * Text of a classpath resource such as {@code /prompts/answer.md}, normalized.
+     * Text of a classpath resource, normalized.
      *
+     * @param resource absolute classpath path, such as {@code /prompts/answer.md}
+     * @return the prompt text, normalized as by {@link #normalize}
      * @throws IllegalStateException if the resource does not exist: a missing prompt should stop the
      *                               application, not send an empty prompt
      */
@@ -43,12 +45,20 @@ public final class Prompts {
         }
     }
 
-    /** Line endings as {@code \n}, trailing whitespace removed. */
+    /**
+     * {@return the text with {@code \n} line endings and trailing whitespace removed}
+     *
+     * @param text a prompt
+     */
     public static String normalize(String text) {
         return text.replace("\r\n", "\n").stripTrailing();
     }
 
-    /** Version of a prompt: the first {@value #VERSION_LENGTH} hexadecimal characters of its SHA-256. */
+    /**
+     * {@return its version: the first {@value #VERSION_LENGTH} hexadecimal characters of its SHA-256}
+     *
+     * @param text the exact text sent to the model
+     */
     public static String version(String text) {
         try {
             byte[] digest = MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8));

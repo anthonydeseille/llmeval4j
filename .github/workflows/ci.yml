@@ -15,7 +15,8 @@ permissions:
 jobs:
   build:
     name: Build and tests (Java ${{ matrix.java }})
-    runs-on: ubuntu-latest
+    # Pinned rather than ubuntu-latest: the OS changes only when we choose to
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     strategy:
       fail-fast: false

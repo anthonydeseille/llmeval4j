@@ -12,20 +12,30 @@ import java.util.Map;
  */
 public record Comparison(Map<String, String> reference, List<Change> changes) {
 
+    /**
+     * Creates a comparison; the list of changes is copied.
+     *
+     * @param reference row of the history compared against, {@code null} if none matches
+     * @param changes   one change per comparable metric
+     */
     public Comparison {
         changes = List.copyOf(changes);
     }
 
+    /** {@return whether a previous run was found to compare with} */
     public boolean hasReference() {
         return reference != null;
     }
 
-    /** Whether at least one metric regressed beyond its threshold: the build should fail. */
+    /** {@return whether at least one metric regressed beyond its threshold: the build should fail} */
     public boolean regression() {
         return changes.stream().anyMatch(Change::regression);
     }
 
-    /** A Markdown table of the changes and the verdict, for a pull request comment or a job summary. */
+    /**
+     * {@return a Markdown table of the changes and the verdict, for a pull request comment or a job
+     * summary}
+     */
     public String toMarkdown() {
         if (!hasReference()) {
             return "No previous run to compare with: nothing to check.\n";
