@@ -16,6 +16,27 @@ framework.
 
 > Status: early development, extracted from a real application. The API may change before 1.0.
 
+## Installation
+
+Published on [JitPack](https://jitpack.io/#anthonydeseille/llmeval4j) for now (Maven Central to come):
+
+```xml
+<repositories>
+    <repository>
+        <id>jitpack</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.github.anthonydeseille</groupId>
+    <artifactId>llmeval4j</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+Gradle: `maven { url 'https://jitpack.io' }` and `implementation 'com.github.anthonydeseille:llmeval4j:0.1.0'`.
+
 ## Quick start
 
 ```java
