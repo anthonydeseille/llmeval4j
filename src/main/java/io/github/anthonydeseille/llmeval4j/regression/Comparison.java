@@ -44,7 +44,8 @@ public record Comparison(Map<String, String> reference, List<Change> changes) {
         for (Change change : changes) {
             md.append("| ").append(change.metric()).append(" | ").append(change.reference()).append(" | ")
                     .append(change.current()).append(" | ").append(change.delta()).append(" | ")
-                    .append(change.regression() ? "❌ regression" : "✅").append(" |\n");
+                    .append(change.regression() ? "❌ regression" : change.informative() ? "informative" : "✅")
+                    .append(" |\n");
         }
         md.append('\n').append(regression()
                 ? "**Regression beyond the thresholds.**"

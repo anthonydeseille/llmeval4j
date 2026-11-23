@@ -139,7 +139,7 @@ RegressionCheck check = RegressionCheck.builder()
         .metric(Metric.percentage("quality_pct", "Quality", 5))          // fails below -5 points
         .metric(Metric.lowerIsBetter("errors", "Errors", 1))             // fails above +1
         .metric(Metric.ratio("verified", "citations", "Verified citations", 2))
-        .metric(Metric.lowerIsBetter("cost_usd", "Cost ($)", Double.POSITIVE_INFINITY))  // shown only
+        .metric(Metric.informative(Metric.lowerIsBetter("cost_usd", "Cost ($)", 0)))   // shown only
         .build();
 
 Comparison comparison = check.compare(EvalHistory.read(Path.of("evals/history.csv")), run);
@@ -152,6 +152,10 @@ assertThat(comparison.regression()).as(comparison.toMarkdown()).isFalse();
 |---|---|---|---|---|
 | Quality | 80% | 74% | -6 pts | ❌ regression |
 | Errors | 2 | 2 | 0 | ✅ |
+| Cost ($) | 1.1 | 1.25 | +0.15 | informative |
+
+`Metric.informative(...)` wraps any metric to show it without ever failing: for an indicator too
+noisy to gate a build, such as retrieval recall when a model writes the search queries.
 
 A metric missing on either side (a judge that did not run, an empty cell) is not compared. With no
 comparable run, nothing is compared and nothing fails. To try a new model, compare it with the

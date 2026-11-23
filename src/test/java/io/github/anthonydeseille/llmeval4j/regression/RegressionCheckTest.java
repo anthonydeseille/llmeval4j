@@ -176,4 +176,27 @@ class RegressionCheckTest {
         run.put("cost_usd", cost);
         return run;
     }
+
+    @Test
+    void an_informative_metric_is_shown_but_never_fails() {
+        RegressionCheck check = RegressionCheck.builder()
+                .sameValuesOf("model", "questions")
+                .metric(Metric.informative(Metric.percentage("quality_pct", "Quality", 5)))
+                .metric(Metric.lowerIsBetter("errors", "Errors", 1))
+                .build();
+
+        Comparison comparison = check.compare(HISTORY, run("claude-sonnet-5-5", 50, 2, 197, 197, 0.45));
+
+        assertThat(comparison.regression()).as("30 points lost, informative only").isFalse();
+        assertThat(comparison.changes()).first()
+                .isEqualTo(new Change("Quality", "80%", "50%", "-30 pts", false, true));
+        assertThat(comparison.toMarkdown()).contains("| Quality | 80% | 50% | -30 pts | informative |",
+                "| Errors | 2 | 2 | 0 | ✅ |");
+    }
+
+    @Test
+    void an_informative_change_cannot_be_a_regression() {
+        assertThatThrownBy(() -> new Change("Quality", "80%", "50%", "-30 pts", true, true))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }

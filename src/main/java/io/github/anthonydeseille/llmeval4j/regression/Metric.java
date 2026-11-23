@@ -68,6 +68,18 @@ public interface Metric {
     }
 
     /**
+     * The same metric, shown but never failing the check: for an indicator too noisy to gate a build
+     * (one that depends on a sampled step, for instance), still worth watching. Its changes are marked
+     * {@link Change#informative()}, and {@link Comparison#toMarkdown()} labels them as such.
+     *
+     * @param metric the metric to show, whatever its threshold
+     * @return the informative metric
+     */
+    static Metric informative(Metric metric) {
+        return new InformativeMetric(metric);
+    }
+
+    /**
      * A share given by two columns, such as verified citations out of all citations, shown as
      * {@code 196/200}: a regression if the share drops by more than {@code maxDropPoints} percentage
      * points. Strict thresholds suit indicators where every miss is a fault, not noise.
