@@ -17,6 +17,12 @@ public record Change(String metric, String reference, String current, String del
     /**
      * Checks that an informative change is not a regression.
      *
+     * @param metric      the metric's label
+     * @param reference   value in the reference run
+     * @param current     value in the current run
+     * @param delta       signed difference
+     * @param regression  whether the change is a regression
+     * @param informative whether the metric is shown without a threshold
      * @throws IllegalArgumentException if both {@code regression} and {@code informative} are set
      */
     public Change {
